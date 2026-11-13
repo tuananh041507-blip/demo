@@ -1,2 +1,647 @@
-hello git
-sssss
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MENTU - Rượu Trái Cây Lên Men Tự Nhiên</title>
+    
+    <!-- Cài đặt Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Cấu hình màu sắc thương hiệu MENTU -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wine: {
+                            light: '#9b3d54',
+                            DEFAULT: '#3C103E', // Đỏ rượu
+                            dark: '#3C103E',
+                        },
+                        gold: {
+                            DEFAULT: '#D4AF37', // Vàng kim
+                            dark: '#aa8c2c',
+                        },
+                        earth: '#fdfbf7' // Trắng ngà
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body { background-color: #fdfbf7; scroll-behavior: smooth; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass { background: rgba(253, 251, 247, 0.95); backdrop-filter: blur(10px); }
+        .hero-intro { background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1558550186-b4ca4f08e4d1?auto=format&fit=crop&q=80') center/cover no-repeat; }
+        .hero-products { background: linear-gradient(rgba(114, 47, 55, 0.8), rgba(114, 47, 55, 0.9)), url('https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&q=80') center/cover no-repeat; }
+        .hero-gifts { background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80') center/cover no-repeat; }
+        
+        /* Cấu hình hiển thị view (SPA) */
+        .view-section { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="font-sans text-gray-800 antialiased relative pt-[120px]">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-32 right-5 z-50 transform transition-all duration-300 translate-x-full opacity-0">
+        <div class="bg-wine text-white px-6 py-3 rounded-lg shadow-xl flex items-center gap-3 border border-gold/30">
+            <i data-lucide="check-circle" class="w-5 h-5 text-gold"></i>
+            <span id="toast-message" class="font-medium">Đã thêm vào giỏ hàng!</span>
+        </div>
+    </div>
+
+    <!-- Header Toàn Diện (Top Bar + Main Nav) -->
+    <header class="fixed w-full top-0 z-40 flex flex-col shadow-sm">
+        
+        <!-- Top Bar: Tìm kiếm & Mạng xã hội -->
+        <div class="bg-wine-dark text-white h-10 flex items-center border-b border-wine/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex justify-between items-center">
+                
+                <!-- Khu vực Tìm kiếm -->
+                <div class="relative group flex items-center">
+                    <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 text-white/60 group-hover:text-gold transition-colors"></i>
+                    <input type="text" id="search-input" placeholder="Tìm kiếm sản phẩm..." onkeypress="handleSearch(event)" 
+                           class="bg-white/10 border border-transparent focus:border-gold/50 text-white text-xs rounded-full pl-8 pr-4 py-1 w-32 sm:w-64 focus:w-48 sm:focus:w-72 transition-all duration-300 outline-none placeholder-white/50">
+                </div>
+                
+                <!-- Khu vực Mạng xã hội -->
+                <div class="flex items-center gap-3 sm:gap-5">
+                    <span class="hidden md:inline-block text-[10px] text-white/50 tracking-widest uppercase mr-2">Kết nối với Mentu</span>
+                    
+                    <!-- Facebook -->
+                    <a href="https://www.facebook.com/profile.php?id=61580677922989" class="text-white/80 hover:text-gold transition-colors" title="Facebook">
+                        <i data-lucide="facebook" class="w-4 h-4"></i>
+                    </a>
+                    
+                    <!-- Instagram -->
+                    <a href="#" class="text-white/80 hover:text-gold transition-colors" title="Instagram">
+                        <i data-lucide="instagram" class="w-4 h-4"></i>
+                    </a>
+                    
+                    <!-- TikTok -->
+                    <a href="#" class="text-white/80 hover:text-gold transition-colors" title="TikTok">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.04-.1z"/>
+                        </svg>
+                    </a>
+
+                    <!-- Zalo -->
+                    <a href="#" class="text-white/80 hover:text-gold transition-colors font-bold text-[11px] tracking-wider" title="Zalo">
+                        <span class="hidden sm:inline">ZALO</span>
+                        <span class="sm:hidden border border-current rounded-full w-4 h-4 flex items-center justify-center text-[9px]">Z</span>
+                    </a>
+
+                    <!-- Messenger -->
+                    <a href="#" class="text-white/80 hover:text-gold transition-colors" title="Messenger">
+                        <svg class="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.477 2 2 6.145 2 11.259c0 2.915 1.531 5.485 3.864 7.095v3.646l3.522-1.936c.833.23 1.71.353 2.614.353 5.523 0 10-4.145 10-9.259S17.523 2 12 2zm1.093 12.316l-2.825-3.013-5.528 3.013 6.071-6.444 2.825 3.012 5.528-3.012-6.071 6.444z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Navbar -->
+        <div class="glass border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <!-- Logo -->
+                    <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="switchView('intro')">
+    <img src="https://scontent.fsgn5-12.fna.fbcdn.net/v/t39.30808-6/652674502_1315478897063437_7232040675341710566_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=UBueWZIvMGEQ7kNvwHFMwGC&_nc_oc=AdnyOuSuWVxp7sUvcoGZfWa8XK8eVxpivtwJxY-v7navPipipXRjshCOYjApYvoY94s&_nc_zt=23&_nc_ht=scontent.fsgn5-12.fna&_nc_gid=Ow2JNgLeZoqTOq-9f-6pVQ&_nc_ss=8&oh=00_AfyhqcWr2VRgTRnRSnV4EcQmVsTfPeAZYi1Zr0EZTrC-lQ&oe=69BC59AA" alt="Mentu" class="h-12 w-auto">
+</div>
+                    </div>
+                    
+                    <!-- Navbar Links -->
+                    <nav class="hidden md:flex space-x-8 items-center">
+                        <button onclick="switchView('intro')" id="nav-intro" class="nav-btn text-gray-600 hover:text-wine font-medium transition border-b-2 border-transparent pb-1">Giới thiệu</button>
+                        <button onclick="switchView('products')" id="nav-products" class="nav-btn text-gray-600 hover:text-wine font-medium transition border-b-2 border-transparent pb-1">Sản phẩm mới</button>
+                        <button onclick="switchView('gifts')" id="nav-gifts" class="nav-btn text-gray-600 hover:text-wine font-medium transition border-b-2 border-transparent pb-1 text-gold-dark">Bộ quà tặng</button>
+                    </nav>
+
+                    <!-- Giỏ hàng Icon -->
+                    <div class="flex items-center">
+                        <button onclick="toggleCart()" class="relative p-2 text-gray-800 hover:text-wine transition-colors group">
+                            <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                            <span id="cart-count" class="absolute top-0 right-0 bg-gold text-wine-dark text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transform group-hover:scale-110 transition-transform shadow-sm">0</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Giỏ hàng -->
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/50 z-50 hidden opacity-0 transition-opacity duration-300"></div>
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-50 transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col pt-10">
+        <div class="flex justify-between items-center p-6 border-b border-gray-100">
+            <h2 class="font-serif text-2xl font-bold text-wine">Giỏ hàng của bạn</h2>
+            <button onclick="toggleCart()" class="text-gray-400 hover:text-gray-800">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-6 no-scrollbar">
+            <div class="text-center text-gray-400 mt-10" id="empty-cart-msg">
+                <i data-lucide="shopping-cart" class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
+                <p>Giỏ hàng đang trống.</p>
+            </div>
+        </div>
+        <div class="border-t border-gray-100 p-6 bg-gray-50">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-gray-600 font-medium">Tổng cộng:</span>
+                <span id="cart-total" class="font-serif text-2xl font-bold text-wine">0đ</span>
+            </div>
+            <button onclick="checkout()" class="w-full bg-wine hover:bg-wine-dark text-white font-bold py-4 rounded-xl transition-colors flex justify-center items-center gap-2">
+                Tiến hành đặt hàng <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Component Cảnh báo độ tuổi (Dùng chung cho các sản phẩm) -->
+    <template id="age-warning-tpl">
+        <div class="mt-6 mb-8 text-sm text-wine-dark bg-wine-light/10 border border-wine/20 p-4 rounded-xl flex items-start gap-3">
+            <i data-lucide="shield-alert" class="w-5 h-5 text-wine flex-shrink-0 mt-0.5"></i>
+            <div>
+                <strong class="block mb-1 text-wine">Độ tuổi sử dụng:</strong>
+                Sản phẩm có nồng độ cồn. Khuyến khích sử dụng cho người từ <strong>20 tuổi trở lên</strong>. Phụ nữ mang thai và người đang lái xe không được sử dụng.
+            </div>
+        </div>
+    </template>
+
+    <!-- ==================== VIEW 1: GIỚI THIỆU CÔNG TY ==================== -->
+    <div id="view-intro" class="view-section active">
+        <!-- Hero Intro -->
+        <section class="hero-intro h-[80vh] flex items-center justify-center text-center px-4">
+            <div class="max-w-4xl mx-auto z-10 text-white mt-10">
+                <span class="text-gold font-medium tracking-[0.2em] uppercase text-sm md:text-base block mb-4">Mentu</span>
+                <h1 class="font-serif text-5xl md:text-7xl font-bold mb-6 leading-tight">Giữ trọn hương vị <br> <span class="text-gold italic">nguyên bản</span></h1>
+                <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+                    Khơi dậy tinh hoa từ trái cây Việt qua quá trình lên men truyền thống kết hợp cùng kỹ thuật hiện đại.
+                </p>
+                <button onclick="switchView('products')" class="inline-block bg-wine text-white border-2 border-wine hover:bg-transparent hover:text-white transition-colors duration-300 font-medium px-8 py-3 rounded-full uppercase tracking-wider text-sm">
+                    Khám phá Sản phẩm
+                </button>
+            </div>
+        </section>
+
+        <!-- Brand Story -->
+        <section class="py-20 md:py-32 bg-earth">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                    <div class="relative group">
+                        <div class="absolute -inset-2 bg-gold/20 transform rotate-2 rounded-2xl transition duration-500 group-hover:rotate-1"></div>
+                        <img src="https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&q=80" alt="" class="relative rounded-2xl shadow-xl w-full object-cover h-[500px]">
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="h-px w-12 bg-gold"></div>
+                            <span class="text-gold font-semibold uppercase tracking-wider text-sm">Về Chúng Tôi</span>
+                        </div>
+                        <h2 class="font-serif text-4xl md:text-5xl text-wine font-bold mb-8">Câu chuyện thương hiệu</h2>
+                        <div class="space-y-6 text-gray-600 text-lg leading-relaxed text-justify">
+                            <p><strong>Mentu</strong> được hình thành với mong muốn tạo ra những dòng rượu trái cây lên men tự nhiên, an toàn và phù hợp với khẩu vị người Việt.</p>
+                            <p>Chúng tôi lựa chọn hướng làm rượu dựa trên quá trình lên men truyền thống, kết hợp với các kỹ thuật hiện đại để giữ được hương vị nguyên bản của trái cây, <strong>hoàn toàn không sử dụng hương liệu nhân tạo.</strong></p>
+                            <p class="font-medium text-wine-light italic border-l-4 border-gold pl-4 py-2">"Với Mentu, việc làm rượu không chỉ là tạo ra một sản phẩm để tiêu thụ, mà là xây dựng niềm tin thông qua chất lượng, sự an toàn và sự nhất quán trong từng mẻ rượu."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ==================== VIEW 2: SẢN PHẨM RA MẮT ==================== -->
+    <div id="view-products" class="view-section">
+        <!-- Hero Products -->
+        <section class="hero-products py-24 text-center text-white">
+            <div class="max-w-4xl mx-auto px-4 mt-10">
+                <span class="text-gold font-medium tracking-[0.2em] uppercase text-sm mb-4 block">Bộ sưu tập 2026</span>
+                <h1 class="font-serif text-4xl md:text-6xl font-bold mb-6">Hương Vị Nguyên Bản</h1>
+                <p class="text-lg text-gray-200 font-light max-w-2xl mx-auto leading-relaxed">
+                    Mỗi hương vị là một câu chuyện riêng, mang đậm bản sắc vùng miền và kỹ thuật ủ men truyền thống.
+                </p>
+            </div>
+        </section>
+
+        <main class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
+            
+            <!-- SP 1: Vị Nho -->
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2 overflow-hidden rounded-2xl shadow-lg">
+                    <img src="https://scontent.fsgn5-8.fna.fbcdn.net/v/t39.30808-6/652684065_1315479017063425_6715242624467083209_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=2a1932&_nc_ohc=aWfK8sxy910Q7kNvwFe5dfG&_nc_oc=AdlOOB6PVAzSSppgNVVcIQJ3QrCrl7fMzCiVoKoeGUWe3e67SC-TVgjk3lWUOgoWysE&_nc_zt=23&_nc_ht=scontent.fsgn5-8.fna&_nc_gid=5gwc93t0dtRLCNNvx9AWmg&_nc_ss=8&oh=00_AfzJ3VMr7gkh3h575wM4NfpYyl9N3glYwtgclxMpEGEgXQ&oe=69BC6A33" alt="" class="w-full h-[550px] object-cover hover:scale-105 transition-transform duration-700">
+                </div>
+                <div class="lg:w-1/2">
+                    <span class="text-wine font-semibold uppercase tracking-widest text-sm border-b border-wine pb-1">01 / Truyền Thống</span>
+                    <h2 class="font-serif text-4xl font-bold text-gray-900 mb-2 mt-4">Rượu Lên Men Vị Nho</h2>
+                    <p class="text-wine font-bold text-2xl mb-4">380.000đ</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border border-gray-100 mb-6 shadow-sm">
+                        <h4 class="font-bold text-gray-800 mb-2 flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-gold"></i> Thông tin & Thành phần</h4>
+                        <ul class="text-gray-600 text-sm space-y-1 list-disc list-inside">
+                            <li><strong>Thành phần:</strong> Nho tươi Ninh Thuận (85%), men vang thuần chủng nhập khẩu Pháp, đường phèn tự nhiên, nước tinh khiết.</li>
+                            <li><strong>Nồng độ:</strong> 12% ABV.</li>
+                            <li><strong>Dung tích:</strong> 500ml.</li>
+                        </ul>
+                    </div>
+
+                    <div class="text-gray-600 leading-relaxed text-justify space-y-3 mb-2">
+                        <p>Nho ở vùng nhiều nắng như Ninh Thuận có vị ngọt nhẹ và chua xen lẫn. Với Mentu, nho được chọn làm hương vị chính vì dễ tạo ra một dòng rượu trái cây nhẹ, dễ uống.</p>
+                        <p>Nhờ lên men truyền thống gắt gao, rượu giữ lại được hương vị nguyên bản, không bị quá nặng hay gắt, phù hợp để thưởng thức trong những dịp lễ quan trọng.</p>
+                    </div>
+
+                    <!-- Chèn cảnh báo độ tuổi -->
+                    <div class="age-warning-container"></div>
+
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center border border-gray-300 rounded-full bg-white h-12">
+                            <button onclick="updateTempQty('nho', -1)" class="px-4 text-gray-500 hover:text-wine font-bold">-</button>
+                            <input type="number" id="qty-nho" value="1" min="1" class="w-12 text-center font-bold text-gray-800 bg-transparent focus:outline-none" readonly>
+                            <button onclick="updateTempQty('nho', 1)" class="px-4 text-gray-500 hover:text-wine font-bold">+</button>
+                        </div>
+                        <button onclick="addToCart('nho', 'Rượu Nho Mentu', 380000, 'https://images.unsplash.com/photo-1559564484-e48b3e040ff4?auto=format&fit=crop&q=80')" class="bg-wine hover:bg-wine-dark text-white font-medium h-12 px-8 rounded-full transition-colors flex items-center gap-2">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i> Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SP 2: Vị Mơ -->
+            <div class="flex flex-col lg:flex-row-reverse items-center gap-12">
+                <div class="lg:w-1/2 overflow-hidden rounded-2xl shadow-lg">
+                    <img src="https://freeimage.host/i/qc8NMx9" alt="" class="w-full h-[550px] object-cover hover:scale-105 transition-transform duration-700">
+                </div>
+                <div class="lg:w-1/2">
+                    <span class="text-wine font-semibold uppercase tracking-widest text-sm border-b border-wine pb-1">02 / Thanh Mát</span>
+                    <h2 class="font-serif text-4xl font-bold text-gray-900 mb-2 mt-4">Rượu Lên Men Vị Mơ</h2>
+                    <p class="text-wine font-bold text-2xl mb-4">420.000đ</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border border-gray-100 mb-6 shadow-sm">
+                        <h4 class="font-bold text-gray-800 mb-2 flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-gold"></i> Thông tin & Thành phần</h4>
+                        <ul class="text-gray-600 text-sm space-y-1 list-disc list-inside">
+                            <li><strong>Thành phần:</strong> Mơ tươi thu hoạch tại Mộc Châu (Sơn La), men vang, đường phèn, mật ong rừng.</li>
+                            <li><strong>Nồng độ:</strong> 14% ABV.</li>
+                            <li><strong>Dung tích:</strong> 500ml.</li>
+                        </ul>
+                    </div>
+
+                    <div class="text-gray-600 leading-relaxed text-justify space-y-3 mb-2">
+                        <p>Mơ có vị chua thanh đặc trưng. Mentu chọn mơ để tạo ra hương vị khác biệt so với rượu ngọt phổ biến. Trong quá trình lên men, vị chua tự nhiên được làm dịu lại.</p>
+                        <p>Rượu mơ Mentu không hướng đến độ ngọt rõ rệt, mà giữ lại hậu vị thanh mát, phù hợp với những người thích cảm giác êm ái, không quá nồng.</p>
+                    </div>
+
+                    <div class="age-warning-container"></div>
+
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center border border-gray-300 rounded-full bg-white h-12">
+                            <button onclick="updateTempQty('mo', -1)" class="px-4 text-gray-500 hover:text-wine font-bold">-</button>
+                            <input type="number" id="qty-mo" value="1" min="1" class="w-12 text-center font-bold text-gray-800 bg-transparent focus:outline-none" readonly>
+                            <button onclick="updateTempQty('mo', 1)" class="px-4 text-gray-500 hover:text-wine font-bold">+</button>
+                        </div>
+                        <button onclick="addToCart('mo', 'Rượu Mơ Mentu', 420000, 'https://images.unsplash.com/photo-1572864692780-e3ebcba896ed?auto=format&fit=crop&q=80')" class="bg-wine hover:bg-wine-dark text-white font-medium h-12 px-8 rounded-full transition-colors flex items-center gap-2">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i> Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SP 3: Dâu Tằm -->
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2 overflow-hidden rounded-2xl shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1557028126-7bd8dd426dce?auto=format&fit=crop&q=80" alt="" class="w-full h-[550px] object-cover hover:scale-105 transition-transform duration-700">
+                </div>
+                <div class="lg:w-1/2">
+                    <span class="text-wine font-semibold uppercase tracking-widest text-sm border-b border-wine pb-1">03 / Đậm Đà</span>
+                    <h2 class="font-serif text-4xl font-bold text-gray-900 mb-2 mt-4">Rượu Vị Dâu Tằm</h2>
+                    <p class="text-wine font-bold text-2xl mb-4">350.000đ</p>
+                    
+                    <div class="bg-white p-4 rounded-xl border border-gray-100 mb-6 shadow-sm">
+                        <h4 class="font-bold text-gray-800 mb-2 flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-gold"></i> Thông tin & Thành phần</h4>
+                        <ul class="text-gray-600 text-sm space-y-1 list-disc list-inside">
+                            <li><strong>Thành phần:</strong> Dâu tằm chín mọng Đà Lạt (90%), men tự nhiên, đường mía thô.</li>
+                            <li><strong>Nồng độ:</strong> 11% ABV.</li>
+                            <li><strong>Dung tích:</strong> 500ml.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="text-gray-600 leading-relaxed text-justify mb-2">
+                        <p>Dâu tằm có vị chua ngọt đan xen và giàu dưỡng chất. Khi lên men, rượu cho ra màu đỏ tím tự nhiên tuyệt đẹp, vị chua dịu, không gắt, để lại dư vị rất lâu nơi đầu lưỡi.</p>
+                    </div>
+                    
+                    <div class="age-warning-container"></div>
+                    
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center border border-gray-300 rounded-full bg-white h-12">
+                            <button onclick="updateTempQty('dau', -1)" class="px-4 text-gray-500 hover:text-wine font-bold">-</button>
+                            <input type="number" id="qty-dau" value="1" readonly class="w-12 text-center font-bold text-gray-800 bg-transparent">
+                            <button onclick="updateTempQty('dau', 1)" class="px-4 text-gray-500 hover:text-wine font-bold">+</button>
+                        </div>
+                        <button onclick="addToCart('dau', 'Rượu Dâu Tằm Mentu', 350000, 'https://images.unsplash.com/photo-1557028126-7bd8dd426dce?auto=format&fit=crop&q=80')" class="bg-wine hover:bg-wine-dark text-white font-medium h-12 px-8 rounded-full flex items-center gap-2">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i> Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SP 4: Nho mix Soda Chanh -->
+            <div class="flex flex-col lg:flex-row-reverse items-center gap-12 bg-white p-8 rounded-3xl shadow-xl border border-gold/20 relative mt-16">
+                <div class="absolute -top-5 -right-5 bg-gold text-white font-bold px-6 py-2 rounded-full shadow-lg transform rotate-6 z-10">⭐ VỊ ĐẶC BIỆT</div>
+                <div class="lg:w-1/2 overflow-hidden rounded-2xl">
+                    <img src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&q=80" alt="" class="w-full h-[550px] object-cover hover:scale-105 transition-transform duration-700">
+                </div>
+                <div class="lg:w-1/2">
+                    <span class="text-gold font-semibold uppercase tracking-widest text-sm border-b border-gold pb-1">04 / Phá Cách</span>
+                    <h2 class="font-serif text-4xl font-bold text-gray-900 mb-2 mt-4">Nho mix Soda Chanh</h2>
+                    <p class="text-wine font-bold text-2xl mb-4">280.000đ</p>
+                    
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6 shadow-sm">
+                        <h4 class="font-bold text-gray-800 mb-2 flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-gold"></i> Thông tin & Thành phần</h4>
+                        <ul class="text-gray-600 text-sm space-y-1 list-disc list-inside">
+                            <li><strong>Thành phần:</strong> Rượu nho nguyên bản Mentu (40%), Soda có ga sảng khoái, nước cốt chanh tươi, siro đường mía.</li>
+                            <li><strong>Nồng độ:</strong> Nhẹ nhàng 5% ABV.</li>
+                            <li><strong>Dung tích:</strong> 330ml.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="text-gray-600 leading-relaxed text-justify mb-2">
+                        Sự kết hợp hoàn hảo giữa vị ngọt của rượu nho hòa quyện cùng vị chua mát, sảng khoái của soda chanh. Lựa chọn tuyệt vời cho những buổi tiệc nhẹ nhàng, tươi trẻ và sảng khoái.
+                    </div>
+                    
+                    <div class="age-warning-container"></div>
+                    
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center border border-gray-300 rounded-full bg-white h-12">
+                            <button onclick="updateTempQty('soda', -1)" class="px-4 text-gray-500 hover:text-gold font-bold">-</button>
+                            <input type="number" id="qty-soda" value="1" readonly class="w-12 text-center font-bold text-gray-800 bg-transparent">
+                            <button onclick="updateTempQty('soda', 1)" class="px-4 text-gray-500 hover:text-gold font-bold">+</button>
+                        </div>
+                        <button onclick="addToCart('soda', 'Nho mix Soda Chanh', 280000, 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&q=80')" class="bg-gold hover:bg-gold-dark text-white font-medium h-12 px-8 rounded-full flex items-center gap-2 shadow-lg shadow-gold/30">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i> Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================== VIEW 3: BỘ QUÀ TẶNG ==================== -->
+    <div id="view-gifts" class="view-section">
+        <!-- Hero Gifts -->
+        <section class="hero-gifts py-24 text-center text-white">
+            <div class="max-w-4xl mx-auto px-4 mt-10">
+                <i data-lucide="gift" class="w-12 h-12 text-gold mx-auto mb-4"></i>
+                <h1 class="font-serif text-4xl md:text-6xl font-bold mb-6">Món Quà Tri Ân</h1>
+                <p class="text-lg text-gray-200 font-light max-w-2xl mx-auto leading-relaxed">
+                    Gửi gắm tình cảm chân thành qua những bộ quà tặng thiết kế sang trọng, tinh tế. Phù hợp cho đối tác, gia đình và những người trân quý.
+                </p>
+            </div>
+        </section>
+
+        <main class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                
+                <!-- Hộp quà 1 -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-100 flex flex-col group">
+                    <div class="relative overflow-hidden h-72">
+                        <img src="https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&q=80" alt="" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-4 right-4 bg-wine text-white text-xs font-bold px-3 py-1 rounded-full">BEST SELLER</div>
+                    </div>
+                    <div class="p-8 flex flex-col flex-grow">
+                        <h3 class="font-serif text-3xl font-bold text-gray-900 mb-2">Hộp Quà Gỗ "Tinh Hoa"</h3>
+                        <p class="text-wine font-bold text-xl mb-4">950.000đ</p>
+                        <p class="text-gray-600 mb-6 flex-grow">Bộ quà tặng mộc mạc nhưng sang trọng, bao gồm 2 chai rượu MENTU tuỳ chọn, kèm theo 2 ly thuỷ tinh pha lê cao cấp và thiệp viết tay trong hộp gỗ thông nguyên khối.</p>
+                        
+                        <!-- Lưu ý độ tuổi thu gọn cho Gift -->
+                        <div class="text-xs text-red-600 bg-red-50 p-2 rounded mb-6 flex items-center gap-2">
+                            <i data-lucide="alert-circle" class="w-4 h-4"></i> SP chứa cồn, dành cho người từ 20 tuổi trở lên.
+                        </div>
+
+                        <button onclick="addToCart('gift1', 'Hộp Quà Gỗ Tinh Hoa', 950000, 'https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&q=80')" class="w-full border-2 border-wine text-wine hover:bg-wine hover:text-white font-medium py-3 rounded-full transition-colors flex justify-center items-center gap-2">
+                            <i data-lucide="gift" class="w-5 h-5"></i> Chọn mua hộp quà này
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hộp quà 2 -->
+                <div class="bg-wine-dark text-white rounded-3xl overflow-hidden shadow-xl flex flex-col group relative">
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 z-0"></div>
+                    <div class="relative z-10 overflow-hidden h-72">
+                        <img src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80" alt="" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-4 right-4 bg-gold text-wine-dark text-xs font-bold px-3 py-1 rounded-full">PREMIUM</div>
+                    </div>
+                    <div class="p-8 flex flex-col flex-grow relative z-10">
+                        <h3 class="font-serif text-3xl font-bold text-gold mb-2">Hộp Quà "Đoàn Viên"</h3>
+                        <p class="text-white font-bold text-xl mb-4">1.250.000đ</p>
+                        <p class="text-gray-300 mb-6 flex-grow">Lựa chọn đẳng cấp nhất. Bao gồm trọn bộ 3 hương vị tinh tuý (Nho, Mơ, Dâu Tằm) được đặt trong hộp giấy mỹ thuật ép kim vàng sang trọng. Tặng kèm dụng cụ mở rượu vang chuyên nghiệp.</p>
+                        
+                        <div class="text-xs text-white/80 bg-red-900/50 border border-red-500/30 p-2 rounded mb-6 flex items-center gap-2">
+                            <i data-lucide="alert-circle" class="w-4 h-4 text-red-400"></i> SP chứa cồn, dành cho người từ 20 tuổi trở lên.
+                        </div>
+
+                        <button onclick="addToCart('gift2', 'Hộp Quà Đoàn Viên', 1250000, 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80')" class="w-full bg-gold hover:bg-gold-dark text-wine-dark font-bold py-3 rounded-full transition-colors flex justify-center items-center gap-2">
+                            <i data-lucide="gift" class="w-5 h-5"></i> Chọn mua hộp quà này
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Global Footer -->
+    <footer class="bg-[#1a1a1a] text-gray-400 py-16 border-t border-gray-800 mt-10 relative">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h3 class="font-serif text-2xl text-gold tracking-widest uppercase mb-4">Mentu</h3>
+                <p class="mb-4 text-sm leading-relaxed">Rượu trái cây lên men tự nhiên - An toàn, truyền thống và chất lượng trong từng mẻ rượu. Giữ trọn hương vị nguyên bản của nông sản Việt.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Liên hệ</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><i data-lucide="map-pin" class="inline w-4 h-4 mr-2"></i> 123 Đường Lên Men, TP.HCM</li>
+                    <li><i data-lucide="phone" class="inline w-4 h-4 mr-2"></i> 0909 123 456</li>
+                    <li><i data-lucide="mail" class="inline w-4 h-4 mr-2"></i> hello@mentu.vn</li>
+                </ul>
+            </div>
+            <div>
+                <!-- Cảnh báo bản quyền & pháp lý (Bắt buộc cho web rượu) -->
+                <div class="border border-gray-700 p-4 rounded-lg bg-black/30">
+                    <h4 class="text-red-500 font-bold mb-2 flex items-center gap-2">
+                        <i data-lucide="alert-triangle" class="w-5 h-5"></i> THÔNG ĐIỆP TRÁCH NHIỆM
+                    </h4>
+                    <p class="text-xs text-gray-500 leading-relaxed uppercase">
+                        Thưởng thức có trách nhiệm. <br>
+                        <strong>Khuyến khích sử dụng cho người từ 20 tuổi trở lên.</strong><br>
+                        Không chia sẻ nội dung này cho người dưới 20 tuổi. Đã uống rượu bia, không lái xe.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center text-xs mt-12 text-gray-600 border-t border-gray-800 pt-8">
+            © 2026 Mentu. Bảo lưu mọi quyền.
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT: Điều hướng (SPA), Giỏ hàng & Tìm kiếm -->
+    <script>
+        // 1. Khởi tạo Icon và chèn Template cảnh báo
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            
+            const tpl = document.getElementById('age-warning-tpl').content;
+            const containers = document.querySelectorAll('.age-warning-container');
+            containers.forEach(container => {
+                container.appendChild(document.importNode(tpl, true));
+            });
+            
+            updateNavStyles('intro');
+        });
+
+        // Xử lý sự kiện tìm kiếm giả lập
+        function handleSearch(event) {
+            if (event.key === "Enter") {
+                const keyword = document.getElementById('search-input').value;
+                if(keyword.trim() !== "") {
+                    alert(`Tính năng tìm kiếm đang được kết nối cơ sở dữ liệu. Bạn vừa tìm từ khoá: "${keyword}"`);
+                    document.getElementById('search-input').value = "";
+                }
+            }
+        }
+
+        // 2. Xử lý chuyển đổi View (SPA)
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            updateNavStyles(viewId);
+        }
+
+        function updateNavStyles(activeId) {
+            const navIds = ['intro', 'products', 'gifts'];
+            navIds.forEach(id => {
+                const btn = document.getElementById(`nav-${id}`);
+                if (id === activeId) {
+                    btn.classList.add('text-wine', 'border-wine');
+                    btn.classList.remove('text-gray-600', 'border-transparent');
+                } else {
+                    btn.classList.remove('text-wine', 'border-wine');
+                    btn.classList.add('text-gray-600', 'border-transparent');
+                }
+            });
+        }
+
+        // 3. Xử lý Giỏ hàng
+        let cart = [];
+        const formatMoney = (amount) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+
+        function updateTempQty(productId, change) {
+            const input = document.getElementById(`qty-${productId}`);
+            let currentVal = parseInt(input.value);
+            let newVal = currentVal + change;
+            if (newVal >= 1) input.value = newVal;
+        }
+
+        function addToCart(id, name, price, image) {
+            const qtyInput = document.getElementById(`qty-${id}`);
+            const quantity = qtyInput ? parseInt(qtyInput.value) : 1; 
+
+            const existingItem = cart.find(item => item.id === id);
+            if (existingItem) existingItem.quantity += quantity;
+            else cart.push({ id, name, price, image, quantity });
+
+            if (qtyInput) qtyInput.value = 1;
+
+            updateCartUI();
+            showToast(name);
+        }
+
+        function changeCartItemQty(id, change) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) cart = cart.filter(i => i.id !== id);
+                updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotal = document.getElementById('cart-total');
+
+            cartCount.innerText = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartTotal.innerText = formatMoney(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0));
+
+            cartItemsContainer.innerHTML = '';
+
+            if (cart.length === 0) {
+                cartItemsContainer.appendChild(emptyMsg);
+                emptyMsg.style.display = 'block';
+            } else {
+                emptyMsg.style.display = 'none';
+                cart.forEach(item => {
+                    cartItemsContainer.insertAdjacentHTML('beforeend', `
+                        <div class="flex gap-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                            <img src="${item.image}" alt="${item.name}" class="w-20 h-20 object-cover rounded-lg">
+                            <div class="flex-grow">
+                                <h4 class="font-bold text-gray-800 text-sm mb-1">${item.name}</h4>
+                                <p class="text-wine font-semibold text-sm mb-2">${formatMoney(item.price)}</p>
+                                <div class="flex items-center gap-3">
+                                    <button onclick="changeCartItemQty('${item.id}', -1)" class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 text-gray-600 font-bold">-</button>
+                                    <span class="text-sm font-bold w-4 text-center">${item.quantity}</span>
+                                    <button onclick="changeCartItemQty('${item.id}', 1)" class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 text-gray-600 font-bold">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+        }
+
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            if (sidebar.classList.contains('translate-x-full')) {
+                sidebar.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        function showToast(productName) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = `Đã thêm ${productName} vào giỏ!`;
+            toast.classList.remove('translate-x-full', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-x-full', 'opacity-0'), 3000);
+        }
+
+        function checkout() {
+            if (cart.length === 0) return alert("Giỏ hàng của bạn đang trống.");
+            
+            if(confirm("Xác nhận: Bạn đã đủ 20 tuổi trở lên để tiến hành mua sản phẩm này?")) {
+                alert("Đơn hàng của bạn đã được ghi nhận!\nMentu sẽ liên hệ lại trong thời gian sớm nhất.");
+                cart = [];
+                updateCartUI();
+                toggleCart();
+            }
+        }
+    </script>
+</body>
+</html>
